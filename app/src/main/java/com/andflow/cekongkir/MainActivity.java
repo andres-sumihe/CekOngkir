@@ -27,20 +27,30 @@ public class MainActivity extends AppCompatActivity {
         mTextViewResult = findViewById(R.id.text_view_result);
 
         OkHttpClient client = new OkHttpClient();
-        String url = "thttps://api.rajaongkir.com/starter/province";
+        String url = "https://api.rajaongkir.com/starter/province";
 
-        Request request = new Request.Builder().url(url).build();
+        Request request = new Request.Builder()
+                .url("https://api.rajaongkir.com/starter/province?id=1")
+                .get()
+                .addHeader("key", "ff66dfc01b6a9905f0bd919c0d56b95f")
+                .build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                e.printStackTrace();
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTextViewResult.setText(e.toString());
+                    }
+                });
             }
 
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if(response.isSuccessful()){
                     String myResponse = response.body().string();
+                    System.out.println(myResponse);
                     MainActivity.this.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
