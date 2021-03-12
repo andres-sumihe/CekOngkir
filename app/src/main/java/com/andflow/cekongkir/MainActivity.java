@@ -7,6 +7,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -20,6 +23,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import okhttp3.Call;
@@ -31,13 +35,15 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
-
+    Database mydb;
+    costModels cM;
     private Button swapCity;
     private Button cekOngkir;
     private Spinner mSpinerOrigin;
     private Spinner mSpinerDestination;
     private Spinner mSpinerCourier;
     private EditText mWeight;
+    private ListView listView;
     ArrayList<DataCost> dataCost = new ArrayList<DataCost>();
     ArrayList<DataType> dataCosts = new ArrayList<DataType>();
     ArrayList<DataCity> dataCities = new ArrayList<DataCity>();
@@ -46,12 +52,25 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        cM = new costModels();
+        mydb = new Database(this);
+
+        listView = findViewById(R.id.user_list);
         mSpinerOrigin = findViewById(R.id.origin);
         swapCity = findViewById(R.id.swapCity);
         cekOngkir = findViewById(R.id.cekPrice);
         mSpinerDestination = findViewById(R.id.destination);
         mSpinerCourier = findViewById(R.id.courier);
         mWeight = findViewById(R.id.weight);
+
+        //mydb.addRecord(new costModels("105", "300", 1000, "jne", "Bandung", "Palembang"));
+
+        //Riwayat Pencarian
+        ArrayList<HashMap<String, String>> costList = mydb.getAllRecord();
+        ListView lv = (ListView) findViewById(R.id.user_list);
+        ListAdapter adapter = new SimpleAdapter(MainActivity.this, costList, R.layout.list_row,new String[]{"origin-name","destination-name"}, new int[]{R.id.name, R.id.designation});
+        lv.setAdapter(adapter);
+        //Riwayat Pencarian
 
         final String courier[] = {"JNE", "POS", "TIKI"};
         try {
