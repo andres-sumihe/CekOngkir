@@ -80,6 +80,12 @@ public class MainActivity extends AppCompatActivity {
                 String originName = map.get("origin-name");
                 String destinationName = map.get("destination-name");
                 requestFromHistory(map);
+                Intent intent = new Intent(MainActivity.this, BiayaActivity.class); //Replace Class
+                intent.putExtra("data", dataCosts); //Send This to Other Activity
+                intent.putExtra("weight", mWeight.getText().toString());
+                intent.putExtra("destination", destinationName);
+                intent.putExtra("origin", originName);
+                startActivity(intent);
             }
         });
 

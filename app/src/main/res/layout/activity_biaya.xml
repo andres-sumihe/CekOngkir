@@ -31,7 +31,7 @@
             android:orientation="vertical">
 
             <ListView
-                android:id="@+id/service_list"
+                android:id="@+id/serviceListView"
                 android:layout_width="match_parent"
                 android:layout_height="533dp"
                 android:dividerHeight="1dp" />
