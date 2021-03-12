@@ -18,7 +18,7 @@ public class BiayaActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String origin =intent.getStringExtra("origin");
         String destination =intent.getStringExtra("destination");
-        //int weight = intent.getIntExtra("weight", 0);
+        int weight = intent.getIntExtra("weight", 0);
         tvTest = findViewById(R.id.test);
         tvTest.setText(origin);
     }
