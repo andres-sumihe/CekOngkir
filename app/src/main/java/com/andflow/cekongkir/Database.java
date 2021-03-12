@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +64,7 @@ public class Database extends SQLiteOpenHelper {
         values.put(KEY_ORIGIN_NAME, costModels.getOrigin_name());
         values.put(KEY_DESTINATION_NAME, costModels.getDestination_name());
         db.insert(TABLE_COST, null, values);
+        Log.d("ROW Add", "Berhasil Upload");
         db.close();
     }
 
@@ -89,6 +91,7 @@ public class Database extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         // return cost list
+
         return costList;
     }
 

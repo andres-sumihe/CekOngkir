@@ -1,9 +1,11 @@
 package com.andflow.cekongkir;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +15,7 @@ import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -63,13 +66,23 @@ public class MainActivity extends AppCompatActivity {
         mSpinerCourier = findViewById(R.id.courier);
         mWeight = findViewById(R.id.weight);
 
-        //mydb.addRecord(new costModels("105", "300", 1000, "jne", "Bandung", "Palembang"));
+
 
         //Riwayat Pencarian
         ArrayList<HashMap<String, String>> costList = mydb.getAllRecord();
         ListView lv = (ListView) findViewById(R.id.user_list);
         ListAdapter adapter = new SimpleAdapter(MainActivity.this, costList, R.layout.list_row,new String[]{"origin-name","destination-name"}, new int[]{R.id.name, R.id.designation});
         lv.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            public void onItemClick(AdapterView<?> listView, View itemView, int itemPosition, long itemId) {
+                HashMap<String,String> map =(HashMap<String,String>)lv.getItemAtPosition(itemPosition);
+                String originName = map.get("origin-name");
+                String destinationName = map.get("destination-name");
+                requestFromHistory(map);
+            }
+        });
+
         //Riwayat Pencarian
 
         final String courier[] = {"JNE", "POS", "TIKI"};
@@ -169,8 +182,90 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    public void cekPrice(View view) {
+    public void requestFromHistory(HashMap<String,String> map){
+        String url = "https://api.rajaongkir.com/starter/cost";
+        String originCek, destinationCek, couriercek;
+        originCek = map.get("origin-id");
+        destinationCek = map.get("destination-id");
+        couriercek = map.get("courier");
+        int weight = Integer.parseInt(map.get("weight"));
+        String content = "origin=" + originCek + "&destination=" + destinationCek + "&weight=" + weight + "&courier=" + couriercek.toLowerCase();
+        ArrayList<DataCost> DataCost = new ArrayList<DataCost>();
 
+        try {
+            OkHttpClient client = new OkHttpClient();
+            MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+            RequestBody body = RequestBody.create(content, mediaType);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .addHeader("key", "ff66dfc01b6a9905f0bd919c0d56b95f")
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    Log.w("Error", "WOW "+e.getMessage());
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+
+                    JSONObject[] jsons =null;
+                    ArrayList<JSONObject> arrays = new ArrayList<JSONObject>();
+                    try{
+                        JSONObject responseJSON = new JSONObject(response.body().string());
+                        Log.d("DATA", responseJSON.getJSONObject("rajaongkir")
+                                .getJSONArray("results")
+                                .getJSONObject(0)
+                                .getJSONArray("costs")
+                                .toString());
+                        JSONArray dataArray = responseJSON.getJSONObject("rajaongkir")
+                                .getJSONArray("results")
+                                .getJSONObject(0)
+                                .getJSONArray("costs");
+                        for (int i = 0; i < dataArray.length();i++){
+                            JSONObject otherJSONObject = dataArray.getJSONObject(i);
+                            arrays.add(otherJSONObject);
+                        }
+                        Log.d("Response", "On DataCosts : "+ dataArray.length());
+                        Log.d("Response", "Data Array : "+ dataArray.toString());
+                        jsons = new JSONObject[arrays.size()];
+                        arrays.toArray(jsons);
+                        List<DataCost> temp = new ArrayList<DataCost>();
+                        for(int i = 0; i< dataArray.length();i++){
+                            JSONObject tempCost = jsons[i]
+                                    .getJSONArray("cost")
+                                    .getJSONObject(0);
+//                            Log.d("Cost", "Cost : "+tempCost.toString() );
+
+//                            Log.d("Value","Service: "+jsons[i].getString("service")+"Harga: "+ Integer.parseInt(tempCost.getString("value")));
+                            temp.add(new DataCost(
+                                    Integer.parseInt(tempCost.getString("value")),
+                                    tempCost.getString("etd"),
+                                    tempCost.getString("note")
+                            ));
+                            dataCosts.add(new DataType(
+                                    jsons[i].getString("service"),
+                                    jsons[i].getString("description"),
+                                    temp
+                            ));
+
+                            Log.d("IN DATATYPE", "Service : "+dataCosts.get(i).service );
+//                                Log.d("Arr", jsons[i].getString("city_name"));
+
+                        }
+                    }catch (Exception e){
+
+                    }
+
+                }
+            });
+        }catch (Exception e){
+            Log.w("ERROR", "TEST : "+e.getMessage());
+        }
+    }
+    public void cekPrice(View view) {
         String url = "https://api.rajaongkir.com/starter/cost";
         String originCek, destinationCek, couriercek;
         originCek = dataCities.get(mSpinerOrigin.getSelectedItemPosition()).cityId;
@@ -252,10 +347,17 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e){
             Log.w("ERROR", "TEST : "+e.getMessage());
         }
+        mydb.addRecord(new costModels(originCek, destinationCek, weight, couriercek,
+                dataCities.get(mSpinerOrigin.getSelectedItemPosition()).cityName,
+                dataCities.get(mSpinerDestination.getSelectedItemPosition()).cityName));
+        ArrayList<HashMap<String, String>> costList = mydb.getAllRecord();
+        ListView lv = (ListView) findViewById(R.id.user_list);
+        ListAdapter adapter = new SimpleAdapter(MainActivity.this, costList, R.layout.list_row,new String[]{"origin-name","destination-name"}, new int[]{R.id.name, R.id.designation});
+        lv.setAdapter(adapter);
 
-        Intent intent = new Intent(this, MainActivity.class); //Replace Class
-        intent.putExtra("data", dataCosts); //Send This to Other Activity
-        startActivity(intent);
+//        Intent intent = new Intent(this, MainActivity.class); //Replace Class
+//        intent.putExtra("data", dataCosts); //Send This to Other Activity
+//        startActivity(intent);
     }
 
 }
