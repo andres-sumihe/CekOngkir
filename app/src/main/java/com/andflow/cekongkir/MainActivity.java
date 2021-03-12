@@ -347,6 +347,8 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e){
             Log.w("ERROR", "TEST : "+e.getMessage());
         }
+        String origin = dataCities.get(mSpinerOrigin.getSelectedItemPosition()).cityName;
+        String destination = dataCities.get(mSpinerDestination.getSelectedItemPosition()).cityName;
         mydb.addRecord(new costModels(originCek, destinationCek, weight, couriercek,
                 dataCities.get(mSpinerOrigin.getSelectedItemPosition()).cityName,
                 dataCities.get(mSpinerDestination.getSelectedItemPosition()).cityName));
@@ -355,9 +357,14 @@ public class MainActivity extends AppCompatActivity {
         ListAdapter adapter = new SimpleAdapter(MainActivity.this, costList, R.layout.list_row,new String[]{"origin-name","destination-name"}, new int[]{R.id.name, R.id.designation});
         lv.setAdapter(adapter);
 
-//        Intent intent = new Intent(this, MainActivity.class); //Replace Class
-//        intent.putExtra("data", dataCosts); //Send This to Other Activity
-//        startActivity(intent);
+        Intent intent = new Intent(this, BiayaActivity.class); //Replace Class
+        intent.putExtra("data", dataCosts); //Send This to Other Activity
+        intent.putExtra("weight", weight);
+        intent.putExtra("destination", destination);
+        intent.putExtra("origin", origin);
+        startActivity(intent);
+
+
     }
 
 }
