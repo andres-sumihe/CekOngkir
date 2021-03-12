@@ -66,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
         mSpinerCourier = findViewById(R.id.courier);
         mWeight = findViewById(R.id.weight);
 
-
-
         //Riwayat Pencarian
         ArrayList<HashMap<String, String>> costList = mydb.getAllRecord();
         ListView lv = (ListView) findViewById(R.id.user_list);
@@ -76,16 +74,18 @@ public class MainActivity extends AppCompatActivity {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> listView, View itemView, int itemPosition, long itemId) {
+                int weight = Integer.parseInt(mWeight.getText().toString());
                 HashMap<String,String> map =(HashMap<String,String>)lv.getItemAtPosition(itemPosition);
                 String originName = map.get("origin-name");
                 String destinationName = map.get("destination-name");
                 requestFromHistory(map);
-                Intent intent = new Intent(MainActivity.this, BiayaActivity.class); //Replace Class
+                Intent intent = new Intent(MainActivity.this, BiayaActivity.class);
                 intent.putExtra("data", dataCosts); //Send This to Other Activity
-                intent.putExtra("weight", mWeight.getText().toString());
-                intent.putExtra("destination", destinationName);
-                intent.putExtra("origin", originName);
+                intent.putExtra("weight", weight);
+                intent.putExtra("destination", originName);
+                intent.putExtra("origin", destinationName);
                 startActivity(intent);
+
             }
         });
 
