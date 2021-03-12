@@ -77,9 +77,9 @@
             android:orientation="vertical" >
 
             <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
                 android:id="@+id/user_list"
+                android:layout_width="match_parent"
+                android:layout_height="533dp"
                 android:dividerHeight="1dp" />
 
         </LinearLayout>
