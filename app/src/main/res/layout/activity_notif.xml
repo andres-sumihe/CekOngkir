@@ -5,12 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".NotifActivity">
 
     <ListView
         android:id="@+id/serviceListView2"
         android:layout_width="match_parent"
-        android:layout_height="533dp"
+        android:layout_height="398dp"
         android:dividerHeight="1dp" />
+
+    <Button
+        android:onClick="clearAllNotif"
+        android:id="@+id/clearAll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Clear All" />
 
 </LinearLayout>

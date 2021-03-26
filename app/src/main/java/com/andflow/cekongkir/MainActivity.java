@@ -281,14 +281,8 @@ public class MainActivity extends AppCompatActivity {
         String destinationName = map.get("destination-name");
 
         Log.d("UkuranData", !dataCosts.isEmpty() ? dataCosts.get(0).service + " " + originName + "|"+destinationName: "Tidak ada data");
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.SECONDS.sleep(1);
         if (!dataCosts.isEmpty()) {
-            Intent in = new Intent(getApplicationContext(), MainActivity.class);
-            String pesanNotif = "Kirim Paket dari " + originName + " ke " + destinationName + " Mulai dari " + dataCosts
-                    .get(0)
-                    .cost.get(0).value;
-            tampilNotifikasi("JUDUL"
-                    , "Pesan", in);
 
             Intent intent = new Intent(MainActivity.this, BiayaActivity.class);
             Bundle args = new Bundle();
@@ -391,14 +385,17 @@ public class MainActivity extends AppCompatActivity {
                 {"origin-name","destination-name"}, new int[]{R.id.name, R.id.designation});
         lv.setAdapter(adapter);
         TimeUnit.SECONDS.sleep(2);
+
+        final String Judul = "CekOngkir.com";
         if(!dataCosts.isEmpty()){
             Intent in = new Intent(getApplicationContext(), MainActivity.class);
             String pesanNotif = "Kirim Paket dari " + origin + " ke " + destination +" Mulai dari " + dataCosts
                     .get(0)
                     .cost.get(0).value;
-            tampilNotifikasi("CekOngkir.com"
+            tampilNotifikasi( Judul
                     , pesanNotif, in);
 
+            mydb.addRecordNotif(new notifModels(Judul, pesanNotif));
             Intent intent = new Intent(this, BiayaActivity.class); //Replace Class
 //        intent.putExtra("data", dataCosts); //Send This to Other Activity
             intent.putExtra("weight", mWeight.getText().toString());
@@ -410,10 +407,9 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
 
         }
-
-
-
     }
+
+
 
 
     private void tampilNotifikasi(String s, String s1, Intent intent) {

@@ -12,7 +12,7 @@ import java.util.HashMap;
 
 public class Database extends SQLiteOpenHelper {
     // static variable
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Database name
     private static final String DATABASE_NAME = "CekOngkir";
@@ -117,7 +117,6 @@ public class Database extends SQLiteOpenHelper {
     public void addRecordNotif(notifModels notifModels){
         SQLiteDatabase db  = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put(KEY_NOTIF_NO_ID, notifModels.getNotif_no_id());
         values.put(KEY_JUDUL, notifModels.getJudul());
         values.put(KEY_ISI, notifModels.getIsi());
         db.insert(TABLE_NOTIF, null, values);
