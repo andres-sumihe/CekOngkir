@@ -19,6 +19,7 @@ public class Database extends SQLiteOpenHelper {
 
     // table name
     private static final String TABLE_COST = "cost";
+    private static final String TABLE_NOTIF = "notifikasi";
 
     // column tables
     private static final String KEY_NO_ID = "id";
@@ -29,6 +30,10 @@ public class Database extends SQLiteOpenHelper {
     private static final String KEY_ORIGIN_NAME = "origin_name";
     private static final String KEY_DESTINATION_NAME = "destination_name";
 
+    private static final String KEY_NOTIF_NO_ID = "notif_no";
+    private static final String KEY_JUDUL = "judul";
+    private static final String KEY_ISI = "isi";
+
     public Database(Context context){
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -36,6 +41,11 @@ public class Database extends SQLiteOpenHelper {
     //Create table
     @Override
     public void onCreate(SQLiteDatabase db) {
+        String CREATE_NOTIF_TABLE = "CREATE TABLE " + TABLE_NOTIF + "("
+                + KEY_NOTIF_NO_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + KEY_JUDUL+ " TEXT,"
+                + KEY_ISI + " TEXT" + ")";
+
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_COST + "("
                 + KEY_NO_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + KEY_ORIGIN_ID + " TEXT,"
@@ -50,6 +60,7 @@ public class Database extends SQLiteOpenHelper {
     // on Upgrade database
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS " +TABLE_NOTIF);
         db.execSQL("DROP TABLE IF EXISTS " +TABLE_COST);
         onCreate(db);
     }
@@ -100,5 +111,39 @@ public class Database extends SQLiteOpenHelper {
         db.delete(TABLE_COST, KEY_NO_ID + " = ?",
                 new String[] { String.valueOf(no_id)});
         db.close();
+    }
+
+    public void addRecordNotif(notifModels notifModels){
+        SQLiteDatabase db  = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_NOTIF_NO_ID, notifModels.getNotif_no_id());
+        values.put(KEY_JUDUL, notifModels.getJudul());
+        values.put(KEY_ISI, notifModels.getIsi());
+        db.insert(TABLE_NOTIF, null, values);
+        Log.d("ROW Add", "Berhasil Upload");
+        db.close();
+    }
+
+    // get All Record
+    public ArrayList<HashMap<String, String>> getAllRecordNotif() {
+        // Select All Query
+        ArrayList<HashMap<String, String>> notifList = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_NOTIF;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                HashMap<String,String> cost = new HashMap<>();
+                cost.put("notif_no",cursor.getString(cursor.getColumnIndex(KEY_NOTIF_NO_ID)));
+                cost.put("judul",cursor.getString(cursor.getColumnIndex(KEY_JUDUL)));
+                cost.put("isi", cursor.getString(cursor.getColumnIndex(KEY_ISI)));
+                notifList.add(cost);
+            } while (cursor.moveToNext());
+        }
+        // return cost list
+
+        return notifList;
     }
 }
