@@ -45,6 +45,7 @@ public class Database extends SQLiteOpenHelper {
                 + KEY_NOTIF_NO_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + KEY_JUDUL+ " TEXT,"
                 + KEY_ISI + " TEXT" + ")";
+        db.execSQL(CREATE_NOTIF_TABLE);
 
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE_COST + "("
                 + KEY_NO_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -145,5 +146,18 @@ public class Database extends SQLiteOpenHelper {
         // return cost list
 
         return notifList;
+    }
+
+
+    public void deleteNotif(int notif_no_id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NOTIF, KEY_NOTIF_NO_ID+ " = ?",
+                new String[] { String.valueOf(notif_no_id)});
+        db.close();
+    }
+
+    public void deleteAllNotif(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("delete from "+ TABLE_NOTIF);
     }
 }

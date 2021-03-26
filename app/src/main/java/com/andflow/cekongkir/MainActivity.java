@@ -39,6 +39,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -90,7 +91,11 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> listView, View itemView, int itemPosition, long itemId) {
 //                int weight = Integer.parseInt(mWeight.getText().toString());
                 HashMap<String,String> map =(HashMap<String,String>)lv.getItemAtPosition(itemPosition);
-                requestFromHistory(map);
+                try {
+                    requestFromHistory(map);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
             }
         });
@@ -106,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
             Request request = new Request.Builder()
                     .url("https://api.rajaongkir.com/starter/city?province=10")
                     .get()
-                    .addHeader("key", "ff66dfc01b6a9905f0bd919c0d56b95f")
+                    .addHeader("key", "54a1539c005e75ef0f6c17dbc30ed1c8")
                     .build();
 
             client.newCall(request).enqueue(new Callback() {
@@ -193,7 +198,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    public void requestFromHistory(HashMap<String,String> map){
+    public void requestFromHistory(HashMap<String,String> map) throws InterruptedException {
+        dataCosts.removeAll(dataCosts);
         String url = "https://api.rajaongkir.com/starter/cost";
         String originCek, destinationCek, couriercek;
         originCek = map.get("origin-id");
@@ -210,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
             Request request = new Request.Builder()
                     .url(url)
                     .post(body)
-                    .addHeader("key", "ff66dfc01b6a9905f0bd919c0d56b95f")
+                    .addHeader("key", "54a1539c005e75ef0f6c17dbc30ed1c8")
                     .build();
 
             client.newCall(request).enqueue(new Callback() {
@@ -273,24 +279,37 @@ public class MainActivity extends AppCompatActivity {
 
         String originName = map.get("origin-name");
         String destinationName = map.get("destination-name");
-        Log.d("UkuranData", !dataCosts.isEmpty() ? dataCosts.get(0).service + " " + originName + "|"+destinationName: "Tidak ada data");
-        Intent in = new Intent(getApplicationContext(), MainActivity.class);
-        // memanggil method untuk menampilkan NOTIFICATION_ID
-        // dengan mengirimkan data yang dikirim dari komponen EditText
-        tampilNotifikasi("JUDUL"
-                , "Pesan", in);
 
-        Intent intent = new Intent(MainActivity.this, BiayaActivity.class);
-        Bundle args = new Bundle();
-        args.putSerializable("ARRAYLIST",(Serializable)dataCosts);
-        intent.putExtra("BUNDLE",args);
-        intent.putExtra("weight", map.get("weight"));
-        intent.putExtra("origin", originName);
-        intent.putExtra("destination", destinationName);
-        startActivity(intent);
+        Log.d("UkuranData", !dataCosts.isEmpty() ? dataCosts.get(0).service + " " + originName + "|"+destinationName: "Tidak ada data");
+        TimeUnit.SECONDS.sleep(2);
+        if (!dataCosts.isEmpty()) {
+            Intent in = new Intent(getApplicationContext(), MainActivity.class);
+            String pesanNotif = "Kirim Paket dari " + originName + " ke " + destinationName + " Mulai dari " + dataCosts
+                    .get(0)
+                    .cost.get(0).value;
+            tampilNotifikasi("JUDUL"
+                    , "Pesan", in);
+
+            Intent intent = new Intent(MainActivity.this, BiayaActivity.class);
+            Bundle args = new Bundle();
+            args.putSerializable("ARRAYLIST", (Serializable) dataCosts);
+            intent.putExtra("BUNDLE", args);
+            intent.putExtra("weight", map.get("weight"));
+            intent.putExtra("origin", originName);
+            intent.putExtra("destination", destinationName);
+            startActivity(intent);
+
+        }
 
     }
-    public void cekPrice(View view) {
+
+    public void keNotif(View v){
+        Intent intent = new Intent(this, NotifActivity.class);
+        startActivity(intent);
+    }
+
+    public void cekPrice(View view) throws InterruptedException {
+        dataCosts.removeAll(dataCosts);
         String url = "https://api.rajaongkir.com/starter/cost";
         String originCek, destinationCek, couriercek;
         originCek = dataCities.get(mSpinerOrigin.getSelectedItemPosition()).cityId;
@@ -307,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
             Request request = new Request.Builder()
                     .url(url)
                     .post(body)
-                    .addHeader("key", "ff66dfc01b6a9905f0bd919c0d56b95f")
+                    .addHeader("key", "54a1539c005e75ef0f6c17dbc30ed1c8")
                     .build();
 
             client.newCall(request).enqueue(new Callback() {
@@ -371,22 +390,27 @@ public class MainActivity extends AppCompatActivity {
         ListAdapter adapter = new SimpleAdapter(MainActivity.this, costList, R.layout.list_row,new String[]
                 {"origin-name","destination-name"}, new int[]{R.id.name, R.id.designation});
         lv.setAdapter(adapter);
+        TimeUnit.SECONDS.sleep(2);
+        if(!dataCosts.isEmpty()){
+            Intent in = new Intent(getApplicationContext(), MainActivity.class);
+            String pesanNotif = "Kirim Paket dari " + origin + " ke " + destination +" Mulai dari " + dataCosts
+                    .get(0)
+                    .cost.get(0).value;
+            tampilNotifikasi("CekOngkir.com"
+                    , pesanNotif, in);
 
-        Intent in = new Intent(getApplicationContext(), MainActivity.class);
-        // memanggil method untuk menampilkan NOTIFICATION_ID
-        // dengan mengirimkan data yang dikirim dari komponen EditText
-        tampilNotifikasi("JUDUL"
-                , "Pesan", in);
-
-        Intent intent = new Intent(this, BiayaActivity.class); //Replace Class
+            Intent intent = new Intent(this, BiayaActivity.class); //Replace Class
 //        intent.putExtra("data", dataCosts); //Send This to Other Activity
-        intent.putExtra("weight", mWeight.getText().toString());
-        intent.putExtra("destination", destination);
-        intent.putExtra("origin", origin);
-        Bundle args = new Bundle();
-        args.putSerializable("ARRAYLIST",(Serializable)dataCosts);
-        intent.putExtra("BUNDLE",args);
-        startActivity(intent);
+            intent.putExtra("weight", mWeight.getText().toString());
+            intent.putExtra("destination", destination);
+            intent.putExtra("origin", origin);
+            Bundle args = new Bundle();
+            args.putSerializable("ARRAYLIST",(Serializable)dataCosts);
+            intent.putExtra("BUNDLE",args);
+            startActivity(intent);
+
+        }
+
 
 
     }

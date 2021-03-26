@@ -23,12 +23,12 @@ public class NotifActivity extends AppCompatActivity {
 
         nM = new notifModels();
         mydb = new Database(this);
-        /*
+
         ArrayList<HashMap<String, String>> notifList = mydb.getAllRecordNotif();
         ListView lv = (ListView) findViewById(R.id.serviceListView2);
         ListAdapter adapter = new SimpleAdapter(NotifActivity.this, notifList, R.layout.list_notif,new String[]
                 {"judul","isi"}, new int[]{R.id.name1, R.id.designation1});
         lv.setAdapter(adapter);
-        */
+
     }
 }

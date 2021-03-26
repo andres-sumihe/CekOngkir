@@ -28,6 +28,12 @@
             android:id="@+id/destination"
             android:layout_width="144dp"
             android:layout_height="50dp" />
+        <ImageButton
+            android:id="@+id/imageButton"
+            android:onClick="keNotif"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/ic_popup_reminder" />
     </LinearLayout>
 
     <LinearLayout
@@ -78,5 +84,7 @@
                 android:dividerHeight="1dp" />
         </LinearLayout>
     </ScrollView>
+
+
 
 </LinearLayout>

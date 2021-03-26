@@ -30,13 +30,13 @@ public class BiayaActivity extends AppCompatActivity {
         Bundle args = intent.getBundleExtra("BUNDLE");
         ArrayList<DataType> data = (ArrayList<DataType>) args.getSerializable("ARRAYLIST");
         Log.d("DATA SIZE: ", data.size()+"");
-        HashMap<String, String>  temp = new HashMap<>();
+
         ArrayList<HashMap<String, String>> costList = new ArrayList<>();
         for(int i = 0; i < data.size(); i++){
+            HashMap<String, String>  temp = new HashMap<>();
             temp.put("service",data.get(i).service );
-            Log.i("In Data: ", data.get(i).service+" "+data.get(i).cost.get(0).value.toString() +" "+data.get(i).cost.get(0).etd );
-            temp.put("value",data.get(i).cost.get(0).value.toString() );
-            temp.put("etd",data.get(i).cost.get(0).etd );
+            temp.put("value",data.get(i).cost.get(i).value.toString() );
+            temp.put("etd",data.get(i).cost.get(i).etd );
             costList.add(temp);
 //            temp.clear();
         }
