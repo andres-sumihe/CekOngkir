@@ -1,7 +1,16 @@
 package com.andflow.cekongkir;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.media.RingtoneManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -39,6 +49,9 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int NOTIFICATION_ID = 1;
+    private static final String NOTIFICATION_CHANNEL_ID = "my_notification_channel";
+
     Database mydb;
     costModels cM;
     private Button swapCity;
@@ -261,6 +274,12 @@ public class MainActivity extends AppCompatActivity {
         String originName = map.get("origin-name");
         String destinationName = map.get("destination-name");
         Log.d("UkuranData", !dataCosts.isEmpty() ? dataCosts.get(0).service + " " + originName + "|"+destinationName: "Tidak ada data");
+        Intent in = new Intent(getApplicationContext(), MainActivity.class);
+        // memanggil method untuk menampilkan NOTIFICATION_ID
+        // dengan mengirimkan data yang dikirim dari komponen EditText
+        tampilNotifikasi("JUDUL"
+                , "Pesan", in);
+
         Intent intent = new Intent(MainActivity.this, BiayaActivity.class);
         Bundle args = new Bundle();
         args.putSerializable("ARRAYLIST",(Serializable)dataCosts);
@@ -353,6 +372,12 @@ public class MainActivity extends AppCompatActivity {
                 {"origin-name","destination-name"}, new int[]{R.id.name, R.id.designation});
         lv.setAdapter(adapter);
 
+        Intent in = new Intent(getApplicationContext(), MainActivity.class);
+        // memanggil method untuk menampilkan NOTIFICATION_ID
+        // dengan mengirimkan data yang dikirim dari komponen EditText
+        tampilNotifikasi("JUDUL"
+                , "Pesan", in);
+
         Intent intent = new Intent(this, BiayaActivity.class); //Replace Class
 //        intent.putExtra("data", dataCosts); //Send This to Other Activity
         intent.putExtra("weight", mWeight.getText().toString());
@@ -364,6 +389,56 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
 
 
+    }
+
+
+    private void tampilNotifikasi(String s, String s1, Intent intent) {
+        // membuat komponen pending intent
+        PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.this
+                , NOTIFICATION_ID, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationManager notificationManager = (NotificationManager) MainActivity.this
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Channel Name", NotificationManager.IMPORTANCE_DEFAULT);
+
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                    .build();
+
+            // Configure the notification channel.
+            notificationChannel.setDescription("Channel description");
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500});
+            notificationChannel.enableVibration(true);
+            notificationChannel.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), audioAttributes);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+
+        // membuat komponen
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+        Notification notification;
+        notification = builder
+                .setChannelId(NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setVibrate(new long[]{100, 200, 100, 200})
+                .setAutoCancel(true)
+                .setContentIntent(pendingIntent)
+                .setContentTitle(s)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setLargeIcon(BitmapFactory.decodeResource(MainActivity.this.getResources()
+                        , R.mipmap.ic_launcher))
+                .setContentText(s1)
+                .build();
+
+        notification.flags |= Notification.FLAG_AUTO_CANCEL;
+
+        notificationManager.notify(NOTIFICATION_ID, notification);
     }
 
 }
