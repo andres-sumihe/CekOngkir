@@ -8,18 +8,18 @@
     tools:context=".BiayaActivity">
 
     <TextView
-        android:id="@+id/test"
+        android:id="@+id/city"
         android:layout_width="match_parent"
         android:layout_height="57dp"
         android:gravity="center_vertical"
-        android:padding="20px"
-        android:text="Kota" />
+        android:text="HEHE"
+        android:padding="20px" />
 
     <TextView
-        android:id="@+id/textRiwayat"
+        android:id="@+id/weight"
         android:layout_width="match_parent"
         android:layout_height="111dp"
-        android:text="Riwayat Pencarian" />
+        android:text="" />
 
     <ScrollView
         android:layout_width="match_parent"

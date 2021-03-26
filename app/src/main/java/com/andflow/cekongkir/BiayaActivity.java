@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -14,34 +15,44 @@ import java.util.HashMap;
 
 public class BiayaActivity extends AppCompatActivity {
 
-    TextView tvTest;
+    TextView tvCity;
+    TextView tvWeight;
     private ListView lv;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_biaya);
+        tvCity = findViewById(R.id.city);
+        tvWeight = findViewById(R.id.weight);
+
+
         Intent intent = getIntent();
-        ArrayList<DataType> data = (ArrayList<DataType>) intent.getSerializableExtra("data");
+        Bundle args = intent.getBundleExtra("BUNDLE");
+        ArrayList<DataType> data = (ArrayList<DataType>) args.getSerializable("ARRAYLIST");
+        Log.d("DATA SIZE: ", data.size()+"");
         HashMap<String, String>  temp = new HashMap<>();
-        ArrayList<HashMap<String, String>> costList = null;
+        ArrayList<HashMap<String, String>> costList = new ArrayList<>();
         for(int i = 0; i < data.size(); i++){
             temp.put("service",data.get(i).service );
+            Log.i("In Data: ", data.get(i).service+" "+data.get(i).cost.get(0).value.toString() +" "+data.get(i).cost.get(0).etd );
             temp.put("value",data.get(i).cost.get(0).value.toString() );
-            temp.put("value",data.get(i).cost.get(0).etd );
+            temp.put("etd",data.get(i).cost.get(0).etd );
             costList.add(temp);
-            temp.clear();
+//            temp.clear();
         }
+
         ListView lv = findViewById(R.id.serviceListView);
         ListAdapter adapter = new SimpleAdapter(this,
                 costList,
                 R.layout.service_list,new String[]{"service","value", "etd"}, new int[]{R.id.service, R.id.value, R.id.etd});
         lv.setAdapter(adapter);
 
+        String origin = intent.getStringExtra("origin");
+        String destination = intent.getStringExtra("destination");
+        String wg = intent.getStringExtra("weight");
+        int wgResult = (wg == null) ? 0:  Integer.parseInt(wg) / 1000;
 
-        String origin =intent.getStringExtra("origin");
-        String destination =intent.getStringExtra("destination");
-
-        tvTest = findViewById(R.id.test);
-        tvTest.setText(origin);
+        tvCity.setText(origin+"-"+destination);
+        tvWeight.setText( wgResult +" KG");
     }
 }

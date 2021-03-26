@@ -25,6 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,17 +75,9 @@ public class MainActivity extends AppCompatActivity {
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> listView, View itemView, int itemPosition, long itemId) {
-                int weight = Integer.parseInt(mWeight.getText().toString());
+//                int weight = Integer.parseInt(mWeight.getText().toString());
                 HashMap<String,String> map =(HashMap<String,String>)lv.getItemAtPosition(itemPosition);
-                String originName = map.get("origin-name");
-                String destinationName = map.get("destination-name");
                 requestFromHistory(map);
-                Intent intent = new Intent(MainActivity.this, BiayaActivity.class);
-                intent.putExtra("data", dataCosts); //Send This to Other Activity
-                intent.putExtra("weight", weight);
-                intent.putExtra("destination", originName);
-                intent.putExtra("origin", destinationName);
-                startActivity(intent);
 
             }
         });
@@ -122,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
                         JSONObject[] jsons =null;
                         List<String> city_name = new ArrayList<String>();
                         try {
-                            JSONObject responseJSON = new JSONObject(myResponse);
+                                JSONObject responseJSON = new JSONObject(myResponse);
 //                            Log.d("DATA", responseJSON.getJSONObject("rajaongkir").getJSONArray("results").toString());
                             JSONArray dataArray = responseJSON.getJSONObject("rajaongkir").getJSONArray("results");
                             for (int i = 0; i < dataArray.length();i++){
@@ -150,7 +143,6 @@ public class MainActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
 
-//                    System.out.println(myResponse);
                         MainActivity.this.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -234,8 +226,6 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject otherJSONObject = dataArray.getJSONObject(i);
                             arrays.add(otherJSONObject);
                         }
-                        Log.d("Response", "On DataCosts : "+ dataArray.length());
-                        Log.d("Response", "Data Array : "+ dataArray.toString());
                         jsons = new JSONObject[arrays.size()];
                         arrays.toArray(jsons);
                         List<DataCost> temp = new ArrayList<DataCost>();
@@ -243,9 +233,6 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject tempCost = jsons[i]
                                     .getJSONArray("cost")
                                     .getJSONObject(0);
-//                            Log.d("Cost", "Cost : "+tempCost.toString() );
-
-//                            Log.d("Value","Service: "+jsons[i].getString("service")+"Harga: "+ Integer.parseInt(tempCost.getString("value")));
                             temp.add(new DataCost(
                                     Integer.parseInt(tempCost.getString("value")),
                                     tempCost.getString("etd"),
@@ -258,9 +245,9 @@ public class MainActivity extends AppCompatActivity {
                             ));
 
                             Log.d("IN DATATYPE", "Service : "+dataCosts.get(i).service );
-//                                Log.d("Arr", jsons[i].getString("city_name"));
 
                         }
+
                     }catch (Exception e){
 
                     }
@@ -270,6 +257,19 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e){
             Log.w("ERROR", "TEST : "+e.getMessage());
         }
+
+        String originName = map.get("origin-name");
+        String destinationName = map.get("destination-name");
+        Log.d("UkuranData", !dataCosts.isEmpty() ? dataCosts.get(0).service + " " + originName + "|"+destinationName: "Tidak ada data");
+        Intent intent = new Intent(MainActivity.this, BiayaActivity.class);
+        Bundle args = new Bundle();
+        args.putSerializable("ARRAYLIST",(Serializable)dataCosts);
+        intent.putExtra("BUNDLE",args);
+        intent.putExtra("weight", map.get("weight"));
+        intent.putExtra("origin", originName);
+        intent.putExtra("destination", destinationName);
+        startActivity(intent);
+
     }
     public void cekPrice(View view) {
         String url = "https://api.rajaongkir.com/starter/cost";
@@ -304,11 +304,6 @@ public class MainActivity extends AppCompatActivity {
                     ArrayList<JSONObject> arrays = new ArrayList<JSONObject>();
                     try{
                         JSONObject responseJSON = new JSONObject(response.body().string());
-                        Log.d("DATA", responseJSON.getJSONObject("rajaongkir")
-                                .getJSONArray("results")
-                                .getJSONObject(0)
-                                .getJSONArray("costs")
-                                .toString());
                         JSONArray dataArray = responseJSON.getJSONObject("rajaongkir")
                                 .getJSONArray("results")
                                 .getJSONObject(0)
@@ -317,8 +312,6 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject otherJSONObject = dataArray.getJSONObject(i);
                             arrays.add(otherJSONObject);
                         }
-                        Log.d("Response", "On DataCosts : "+ dataArray.length());
-                        Log.d("Response", "Data Array : "+ dataArray.toString());
                         jsons = new JSONObject[arrays.size()];
                         arrays.toArray(jsons);
                         List<DataCost> temp = new ArrayList<DataCost>();
@@ -326,9 +319,6 @@ public class MainActivity extends AppCompatActivity {
                             JSONObject tempCost = jsons[i]
                                     .getJSONArray("cost")
                                     .getJSONObject(0);
-//                            Log.d("Cost", "Cost : "+tempCost.toString() );
-
-//                            Log.d("Value","Service: "+jsons[i].getString("service")+"Harga: "+ Integer.parseInt(tempCost.getString("value")));
                             temp.add(new DataCost(
                                     Integer.parseInt(tempCost.getString("value")),
                                     tempCost.getString("etd"),
@@ -341,7 +331,6 @@ public class MainActivity extends AppCompatActivity {
                             ));
 
                             Log.d("IN DATATYPE", "Service : "+dataCosts.get(i).service );
-//                                Log.d("Arr", jsons[i].getString("city_name"));
 
                         }
                     }catch (Exception e){
@@ -360,14 +349,18 @@ public class MainActivity extends AppCompatActivity {
                 dataCities.get(mSpinerDestination.getSelectedItemPosition()).cityName));
         ArrayList<HashMap<String, String>> costList = mydb.getAllRecord();
         ListView lv = (ListView) findViewById(R.id.user_list);
-        ListAdapter adapter = new SimpleAdapter(MainActivity.this, costList, R.layout.list_row,new String[]{"origin-name","destination-name"}, new int[]{R.id.name, R.id.designation});
+        ListAdapter adapter = new SimpleAdapter(MainActivity.this, costList, R.layout.list_row,new String[]
+                {"origin-name","destination-name"}, new int[]{R.id.name, R.id.designation});
         lv.setAdapter(adapter);
 
         Intent intent = new Intent(this, BiayaActivity.class); //Replace Class
-        intent.putExtra("data", dataCosts); //Send This to Other Activity
-        intent.putExtra("weight", weight);
+//        intent.putExtra("data", dataCosts); //Send This to Other Activity
+        intent.putExtra("weight", mWeight.getText().toString());
         intent.putExtra("destination", destination);
         intent.putExtra("origin", origin);
+        Bundle args = new Bundle();
+        args.putSerializable("ARRAYLIST",(Serializable)dataCosts);
+        intent.putExtra("BUNDLE",args);
         startActivity(intent);
 
 

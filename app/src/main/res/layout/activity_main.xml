@@ -44,15 +44,14 @@
         <EditText
             android:id="@+id/weight"
             android:layout_width="match_parent"
+            android:text="1000"
             android:layout_height="wrap_content"/>
 
     </LinearLayout>
-
     <Spinner
         android:id="@+id/courier"
         android:layout_width="match_parent"
         android:layout_height="40dp" />
-
     <Button
         android:id="@+id/cekPrice"
         android:layout_width="match_parent"
@@ -60,28 +59,23 @@
         android:text="Cek Biaya Ekspedisi"
         android:onClick="cekPrice"
         app:rippleColor="#FFFFFF" />
-
     <TextView
         android:id="@+id/textRiwayat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Riwayat Pencarian" />
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
-
             <ListView
                 android:id="@+id/user_list"
                 android:layout_width="match_parent"
                 android:layout_height="533dp"
                 android:dividerHeight="1dp" />
-
         </LinearLayout>
     </ScrollView>
 
